@@ -18,12 +18,6 @@
 - name: Add permanent hostname to /etc/hostname
   shell: echo "{{ inventory_hostname }}" > /etc/hostname
 
-- name: config priv IP
-  template: src=interfaces dest=/etc/network/interfaces backup=yes
-
-- name: restart network for priv IP
-  command: "/etc/init.d/networking restart"
-
 - name: Add nginx key
   apt_key: url='http://nginx.org/keys/nginx_signing.key' state=present
 
