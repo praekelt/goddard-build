@@ -1,0 +1,63 @@
+## 9022 - ssh port
+---
+- name: Set correct hostname
+  hostname: name={{inventory_hostname}}
+
+- name: set /etc/localtime
+  file: src=/usr/share/zoneinfo/Africa/Johannesburg dest=/etc/localtime
+
+- name: set /etc/timezone
+  template: src=timezone dest=/etc/timezone
+
+- name: update tzdata
+  command: /usr/sbin/dpkg-reconfigure --frontend noninteractive tzdata
+
+- name: setup hostname
+  template: src=hostname dest=/etc/hostname
+
+- name: Add permanent hostname to /etc/hostname
+  shell: echo "{{ inventory_hostname }}" > /etc/hostname
+
+- name: config priv IP
+  template: src=interfaces dest=/etc/network/interfaces backup=yes
+
+- name: restart network for priv IP
+  command: "/etc/init.d/networking restart"
+
+- name: Add nginx key
+  apt_key: url='http://nginx.org/keys/nginx_signing.key' state=present
+
+- name: Update ppa for nginx
+  apt_repository: repo='deb http://nginx.org/packages/ubuntu/ precise nginx' state=present
+
+- name: Update cache
+  apt: update_cache=yes
+  ignore_errors: yes
+
+- name: upgrade a server
+  apt: upgrade=safe
+
+- name: Install common and deps
+  apt: pkg={{ item }} state=present
+  with_items:
+    - curl
+    - aptitude
+    - git
+    - htop
+    - iftop
+    - build-essential
+    - python-setuptools
+    - 'docker.io'
+    - nginx
+
+- name: Copy over nginx config
+  template: src=nginx.site.conf dest=/etc/nginx/conf.d/default.conf
+
+- name: Restart nginx to apply new config
+  service: name=nginx state=restarted
+
+- name: Check that the docker service is started
+  service: name=docker.io state=started
+
+- name: Install required libraries for python scripts - pip
+  command: easy_install pip

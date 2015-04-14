@@ -1,0 +1,9 @@
+ansible==1.8.4
+configparser==3.5.0b2
+ecdsa==0.13
+Jinja2==2.7.3
+MarkupSafe==0.23
+paramiko==1.15.2
+psycopg2==2.6
+pycrypto==2.6.1
+PyYAML==3.11

@@ -1,0 +1,4 @@
+#!/Users/johanndutoit/Desktop/projects/io/goddard-ansible/bin/python
+# EASY-INSTALL-SCRIPT: 'ansible==1.8.4','ansible'
+__requires__ = 'ansible==1.8.4'
+__import__('pkg_resources').run_script('ansible==1.8.4', 'ansible')
