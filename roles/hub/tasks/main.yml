@@ -1,0 +1,4 @@
+## 9022 - ssh port
+---
+- name: Set correct hostname
+  hostname: name={{inventory_hostname}}

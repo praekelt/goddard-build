@@ -28,7 +28,7 @@ def start():
 	cur = conn.cursor()
 
 	# query the database
-	cur.execute("""SELECT * FROM nodes""")
+	cur.execute("""SELECT id,description, (SELECT name FROM groups WHERE groups.id=nodes.groupId) as groupName FROM nodes""")
 	rows = cur.fetchall() # fetch all the nodes
 
 	# list of machines
@@ -54,7 +54,7 @@ def start():
 		# get the params
 		id_str 				= row[0]
 		name_str 			= row[1]
-		group_strs 			= row[2]
+		group_strs 			= [ row[2] ]
 		ip_str 				= row[3]
 
 		# create a machine object
@@ -88,7 +88,7 @@ def start():
 		grouping_output['nodes'].append(' '.join([
 
 			machine_obj['label'],
-			machine_obj['ip'],
+			'127.0.0.1',
 
 		]))
 
