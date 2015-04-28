@@ -42,6 +42,7 @@ The hub server requires a quick inventory file that points to the existing serve
 
 ````bash
 ansible-playbook -i {some-inventory} hub.yml
+````
 
 #### Nodes
 
