@@ -3,4 +3,3 @@
   user: root
   roles:
     - common
-    - node
