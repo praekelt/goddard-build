@@ -29,3 +29,6 @@
 
 - name: Configure detault NGINX site
   template: src=site.nginx.conf dest=/etc/nginx/conf.d/default
+
+- name: Restart nginx to apply new config
+  service: name=nginx state=restarted
