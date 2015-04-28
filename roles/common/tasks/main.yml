@@ -41,7 +41,6 @@
     - iftop
     - build-essential
     - python-setuptools
-    - 'docker.io'
     - nginx
 
 - name: Copy over nginx config
@@ -49,9 +48,6 @@
 
 - name: Restart nginx to apply new config
   service: name=nginx state=restarted
-
-- name: Check that the docker service is started
-  service: name=docker.io state=started
 
 - name: Install required libraries for python scripts - pip
   command: easy_install pip
