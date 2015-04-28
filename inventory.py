@@ -167,7 +167,7 @@ def start():
 							'slug': app_slug_str,
 							'logo': '',
 							'key': app_image_str,
-							'domain': str(app_slug_str) + ".goddard",
+							'domain': str(app_image_str) + ".goddard",
 							'internal': False
 
 						})
