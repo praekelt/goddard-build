@@ -48,6 +48,3 @@
 
 - name: Restart nginx to apply new config
   service: name=nginx state=restarted
-
-- name: Install required libraries for python scripts - pip
-  command: easy_install pip

@@ -100,7 +100,22 @@ def start():
 			'ansible_ssh_pass': 'rogerwilco',
 			'ansible_ssh_host': 'localhost',
 			'ansible_ssh_port': int(node_port_str),
-			'apps': []
+			'apps': [
+
+				{
+
+					'name': 'Hotspot',
+					'domain': 'goddard',
+					'key': 'hotspot',
+					'slug': 'hotspot',
+					'description': '',
+					'logo': '',
+					'port': 6000,
+					'internal': True
+
+				}
+
+			]
 
 		}
 
@@ -113,8 +128,7 @@ def start():
 
 		}
 
-		# add to general group
-		# output as part 
+		# add to general group output as part 
 		grouping_output['nodes'].append(node_serial_str)
 
 		# if this node belongs to a group ...
@@ -148,9 +162,13 @@ def start():
 						machine_obj['meta']['apps'].append({
 
 							'id': app_id_str,
+							'port': 6100 + int(node_id_str),
 							'name': app_name_str,
 							'slug': app_slug_str,
-							'image': app_image_str
+							'logo': '',
+							'key': app_image_str,
+							'domain': str(app_slug_str) + ".goddard",
+							'internal': False
 
 						})
 
