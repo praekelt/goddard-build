@@ -1,8 +1,9 @@
-#!bin/python
+#!/usr/bin/python
 ##
 # Required modules
 ##
 import psycopg2
+import psycopg2.extras
 import configparser
 import json
 import sys
@@ -30,21 +31,19 @@ def start():
 		sys.exit(1)
 
 	# create the cursor to query db
-	cur = conn.cursor()
-
-	# query the database
+	cur = conn.cursor(cursor_factory=psycopg2.extras.NamedTupleCursor)
 	cur.execute("""SELECT * FROM apps""")
 	app_objs = cur.fetchall() # fetch all the nodes
 
-	nodecur = conn.cursor()
+	nodecur = conn.cursor(cursor_factory=psycopg2.extras.NamedTupleCursor)
 	nodecur.execute("""SELECT * FROM nodes""")
 	node_objs = nodecur.fetchall() # fetch all the nodes
 
-	groupcur = conn.cursor()
+	groupcur = conn.cursor(cursor_factory=psycopg2.extras.NamedTupleCursor)
 	groupcur.execute("""SELECT * FROM groups""")
 	group_objs = groupcur.fetchall() # fetch all the groups
 
-	installcur = conn.cursor()
+	installcur = conn.cursor(cursor_factory=psycopg2.extras.NamedTupleCursor)
 	installcur.execute("""SELECT * FROM installs""")
 	install_objs = installcur.fetchall() # fetch all the groups
 
@@ -70,144 +69,127 @@ def start():
 
 	}
 
-	# output the row
-	for app_obj in app_objs:
+	# loop them all
+	for node_obj in node_objs:
 
 		# get the params
-		id_str = app_obj[0]
-		name_str = app_obj[1]
-		image_str = app_obj[2]
-		description_str = app_obj[3]
-		slug_str = app_obj[4]
+		node_id_str = node_obj.id
+		node_serial_str = node_obj.serial
+		node_label_str = node_obj.name
+		node_port_str  = node_obj.port
+		node_management_port_str = node_obj.mport
+		node_group_id = node_obj.groupId
 
-		# add the group
-		# add if not in already
-		if slug_str not in groupings:
+		# create a machine object
+		machine_obj = {
 
-			# add it
-			groupings[ slug_str ] = []
+			'label': node_label_str,
+			'ip': 'localhost',
+			'id':  int(node_id_str),
+			'meta': {},
+			'serial': node_serial_str
 
-		# loop them all
-		for node_obj in node_objs:
+		}
 
-			# get the params
-			node_id_str = node_obj[0]
-			node_serial_str = node_obj[1]
-			node_label_str = node_obj[1]
-			node_port_str  = node_obj[10]
-			node_management_port_str = node_obj[11]
-			node_group_id = node_obj[19]
+		# add ip to meta
+		machine_obj['meta'] = {
 
-			# create a machine object
-			machine_obj = {
+			'ansible_ssh_user': 'goddard',
+			'ansible_sudo': True,
+			'ansible_sudo_pass': 'rogerwilco',
+			'ansible_ssh_pass': 'rogerwilco',
+			'ansible_ssh_host': 'localhost',
+			'ansible_ssh_port': int(node_port_str),
+			'apps': []
 
-				'label': node_label_str,
-				'ip': 'localhost',
-				'id':  int(node_id_str),
-				'meta': {},
-				'serial': node_serial_str
+		}
 
-			}
+		# add in the extra details
+		machine_obj['meta']['node'] = {
 
-			# add ip to meta
-			machine_obj['meta'] = {
+			'id': node_id_str,
+			'serial': node_serial_str,
+			'label': node_label_str
 
-				'ansible_ssh_user': 'goddard',
-				'ansible_sudo': True,
-				'ansible_sudo_pass': 'rogerwilco',
-				'ansible_ssh_pass': 'rogerwilco',
-				'ansible_ssh_host': 'localhost',
-				'ansible_ssh_port': int(node_port_str),
-				'apps': []
+		}
 
-			}
+		# add to general group
+		# output as part 
+		grouping_output['nodes'].append(node_serial_str)
 
-			# add in the extra details
-			machine_obj['meta']['node'] = {
+		# if this node belongs to a group ...
+		if node_group_id != None:
 
-				'id': node_id_str,
-				'serial': node_serial_str,
-				'label': node_label_str
+			# loop them all
+			for app_obj in app_objs:
 
-			}
+				# group details
+				app_id_str = app_obj.id
+				app_name_str = app_obj.name
+				app_image_str = app_obj.image
+				app_slug_str = app_obj.slug
 
-			# add to general group
-			# output as part 
-			grouping_output['nodes'].append(node_serial_str)
-
-			# if this node belongs to a group ...
-			if node_group_id != None:
-
-				# loop them all
-				for app_obj in app_objs:
-
-					# group details
-					app_id_str = app_obj[0]
-					app_name_str = app_obj[1]
-					app_image_str = app_obj[2]
-					app_slug_str = app_obj[4]
-
-					# loop all the installs for this nodes' groups
-					for install_obj in install_objs:
-
-						# and ... ?
-						if int(install_obj[2]) == int(node_group_id):
-
-							# add if not in already
-							if app_slug_str not in grouping_output:
-
-								# add it
-								grouping_output[ app_slug_str ] = []
-
-							# then create it
-							grouping_output[ app_slug_str ].append( node_serial_str )
-
-							# add app if not in there already
-							machine_obj['meta']['apps'].append({
-
-								'id': app_id_str,
-								'name': app_name_str,
-								'slug': app_slug_str,
-								'image': app_image_str
-
-							})
-
-				# loop them all
-				for group_obj in group_objs:
-
-					# group details
-					group_id_str = group_obj[0]
-					group_name_str = group_obj[1]
-					group_description_str = group_obj[2]
-					group_slug_str = group_obj[2]
+				# loop all the installs for this nodes' groups
+				for install_obj in install_objs:
 
 					# and ... ?
-					if int(group_id_str) == int(node_group_id):
-
-						# add group details
-						machine_obj['meta']['group'] = {
-
-							'id': group_id_str,
-							'name': group_name_str,
-							'description': group_description_str,
-							'slug': group_slug_str
-
-						}
-
-						# set the name
-						group_full_name_str = group_name_str
+					if int(install_obj.groupId) == int(node_group_id):
 
 						# add if not in already
-						if group_name_str not in grouping_output:
+						if app_slug_str not in grouping_output:
 
 							# add it
-							grouping_output[ group_name_str ] = []
+							grouping_output[ app_slug_str ] = []
 
 						# then create it
-						grouping_output[ group_name_str ].append( node_serial_str )
+						grouping_output[ app_slug_str ].append( node_serial_str )
 
-			# add the meta
-			grouping_output['_meta']['hostvars'][ node_serial_str ] = machine_obj['meta']
+						# add app if not in there already
+						machine_obj['meta']['apps'].append({
+
+							'id': app_id_str,
+							'name': app_name_str,
+							'slug': app_slug_str,
+							'image': app_image_str
+
+						})
+
+			# loop them all
+			for group_obj in group_objs:
+
+				# group details
+				group_id_str = group_obj.id
+				group_name_str = group_obj.name
+				group_description_str = group_obj.description
+				group_slug_str = group_obj.name
+
+				# and ... ?
+				if int(group_id_str) == int(node_group_id):
+
+					# add group details
+					machine_obj['meta']['group'] = {
+
+						'id': group_id_str,
+						'name': group_name_str,
+						'description': group_description_str,
+						'slug': group_slug_str
+
+					}
+
+					# set the name
+					group_full_name_str = group_name_str
+
+					# add if not in already
+					if group_name_str not in grouping_output:
+
+						# add it
+						grouping_output[ group_name_str ] = []
+
+					# then create it
+					grouping_output[ group_name_str ].append( node_serial_str )
+
+		# add the meta
+		grouping_output['_meta']['hostvars'][ node_serial_str ] = machine_obj['meta']
 
 	print json.dumps(grouping_output)
 
