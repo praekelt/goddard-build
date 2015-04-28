@@ -1,4 +1,31 @@
 ## 9022 - ssh port
 ---
-- name: Set correct hostname
-  hostname: name={{inventory_hostname}}
+- name: Install common and deps
+  apt: pkg={{ item }} state=present
+  with_items:
+    - redis-server
+    - postgresql-9.3
+
+- name: Create database in postgres for site
+  postgresql_db: name=goddard state=present
+
+- name: Create user for the site in the database
+  postgresql_user: db=goddard name=goddard_user password=ceec4eif7ya priv=CONNECT/products:ALL
+
+- name: Ensure app deployment exists
+  file: path=/var/sites state=directory
+
+- name: Pull Site Code
+  git: repo=git@github.com:praekelt/goddard-hub-server.git dest=/var/sites/hub.goddard
+
+- name: Write out the upstart service to run the goddard hub server
+  template: src=hub.upstart.conf dest=/etc/init/goddard-hub.conf
+
+- name: Restart nginx to apply new config
+  service: name=goddard-hub state=restarted
+
+- name: Configure common NGINX settings
+  template: src=nginx.conf dest=/etc/nginx.conf
+
+- name: Configure detault NGINX site
+  template: src=site.nginx.conf dest=/etc/nginx/conf.d/default

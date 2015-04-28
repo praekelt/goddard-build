@@ -1,8 +1,12 @@
+#!bin/python
 ##
 # Required modules
 ##
 import psycopg2
 import configparser
+import json
+import sys
+import os
 
 # starting point if the script is run
 def start():
@@ -23,13 +27,22 @@ def start():
 	except Exception, e:
 		print "Problems connecting to the database"
 		print e
+		sys.exit(1)
 
 	# create the cursor to query db
 	cur = conn.cursor()
 
 	# query the database
-	cur.execute("""SELECT id,description, (SELECT name FROM groups WHERE groups.id=nodes.groupId) as groupName FROM nodes""")
-	rows = cur.fetchall() # fetch all the nodes
+	cur.execute("""SELECT * FROM apps""")
+	app_objs = cur.fetchall() # fetch all the nodes
+
+	nodecur = conn.cursor()
+	nodecur.execute("""SELECT * FROM nodes""")
+	node_objs = nodecur.fetchall() # fetch all the nodes
+
+	groupcur = conn.cursor()
+	groupcur.execute("""SELECT * FROM groups""")
+	group_objs = groupcur.fetchall() # fetch all the groups
 
 	# list of machines
 	machine_objs = []
@@ -44,80 +57,90 @@ def start():
 	# output lines for each group
 	grouping_output = {
 
-		'nodes': []
+		'nodes': [],
+		'_meta': {
+
+			'hostvars': {}
+
+		}
 
 	}
 
 	# output the row
-	for row in rows:
+	for app_obj in app_objs:
 
 		# get the params
-		id_str 				= row[0]
-		name_str 			= row[1]
-		group_strs 			= [ row[2] ]
-		ip_str 				= row[3]
+		id_str = app_obj[0]
+		name_str = app_obj[1]
+		image_str = app_obj[2]
+		description_str = app_obj[3]
+		slug_str = app_obj[4]
 
-		# create a machine object
-		machine_obj = {
+		# add the group
+		# add if not in already
+		if slug_str not in groupings:
 
-			'label': name_str,
-			'ip': ip_str,
-			'id':  int(id_str)
+			# add it
+			groupings[ slug_str ] = []
 
-		}
+		# loop them all
+		for node_obj in node_objs:
 
-		# append the machine
-		machine_objs.append( machine_obj )
+			# get the params
+			node_id_str = node_obj[0]
+			node_serial_str = node_obj[1]
+			node_label_str = node_obj[21]
+			node_port_str  = node_obj[10]
+			node_management_port_str = node_obj[11]
 
-		# loop all the designated groups
-		for group_str in group_strs:
+			# create a machine object
+			machine_obj = {
 
-			# add if not in already
-			if group_str not in groupings:
+				'label': node_label_str,
+				'ip': 'localhost',
+				'id':  int(node_id_str),
+				'meta': {},
+				'serial': node_serial_str
 
-				# add it
-				groupings[ group_str ] = []
+			}
 
-			# then create it
-			groupings[ group_str ].append( int(id_str) )
+			# add ip to meta
+			machine_obj['meta']['ansible_ssh_host'] = machine_obj['ip']
 
-	# loop all the machines and produce the output
-	for machine_obj in machine_objs:
+			# add the meta
+			grouping_output['_meta']['hostvars'][ machine_obj['label'] ] = machine_obj['meta']
 
-		# output as part 
-		grouping_output['nodes'].append(' '.join([
+			# add to general group
+			# output as part 
+			grouping_output['nodes'].append(' '.join([
 
-			machine_obj['label'],
-			'127.0.0.1',
+				node_label_str,
+				'ansible_ssh_host=' + machine_obj['ip'],
+				'ansible_ssh_port=' + str(node_port_str)
 
-		]))
+			]))
 
-		# add each group and the label
-		for group_name_str in groupings:
+			# loop them all
+			for group_obj in group_objs:
 
-			# is this machine part of that group ?
-			if machine_obj['id'] in groupings[ group_name_str ]:
+				# group details
+				group_id_str = group_obj[0]
+				group_name_str = group_obj[1]
+				group_slug_str = group_obj[2]
 
-				# check if group exists ?
-				if group_name_str not in grouping_output:
+				# set the name
+				group_full_name_str = group_slug_str + ':children'
+
+				# add if not in already
+				if group_slug_str not in groupings:
 
 					# add it
-					grouping_output[ group_name_str ] = []
+					groupings[ group_slug_str ] = []
 
-				# add each
-				grouping_output[ group_name_str ].append( machine_obj['label'] )
+				# then create it
+				groupings[ group_slug_str ].append( node_label_str )
 
-	# loop and print each of the output groups
-	for group_str in grouping_output.keys():
-
-		# output the group name
-		print '[' + group_str + ']'
-
-		# loop all the machines in the group
-		for line_str in grouping_output[group_str]:
-
-			# output it
-			print line_str
+	print json.dumps(grouping_output)
 
 # run the actual logic to print out the inventory
 start()

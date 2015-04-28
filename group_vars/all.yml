@@ -1,0 +1,9 @@
+---
+google_project_client_id: 918792698406-rnf4232a8mha3g3c3trr7t6qeflgfept.apps.googleusercontent.com 
+google_project_client_secret: Wl9fjXqN5N6Cd1xsLp0Ks19Q
+hub_database_url: postgres://goddard_user:11D528C97CCD1D9B4972110AF95FCA590A152DF99C3B1FF3@localhost/goddard 
+hub_port: 3600
+hub_tunnel_server: goddard.io.co.za
+hub_oauth_callback: http://goddard.io.co.za/connect/callback
+hub_domains: 
+- goddard.io.co.za
