@@ -35,7 +35,7 @@
   shell: cat /var/goddard/nginx.img.tar | docker import - iodigital/ubuntu-nginx
 
 - name: Build Docker image of each App
-  shell: docker build --tag="{{item.key}}" --rm=true
+  shell: docker build --tag="{{item.key}}" --rm=true .
   args:
     chdir: "/var/goddard/apps/{{item.key}}"
   when: apps is defined
