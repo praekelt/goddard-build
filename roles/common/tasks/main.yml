@@ -24,12 +24,12 @@
 - name: Update ppa for nginx
   apt_repository: repo='deb http://nginx.org/packages/ubuntu/ precise nginx' state=present
 
-- name: Update cache
-  apt: update_cache=yes
-  ignore_errors: yes
+#- name: Update cache
+#  apt: update_cache=yes
+#  ignore_errors: yes
 
-- name: upgrade a server
-  apt: upgrade=safe
+#- name: upgrade a server
+#  apt: upgrade=safe
 
 - name: Install common and deps
   apt: pkg={{ item }} state=present
