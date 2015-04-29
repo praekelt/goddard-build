@@ -105,7 +105,7 @@ def start():
 				{
 
 					'name': 'Hotspot',
-					'domain': 'goddard',
+					'domain': 'goddard.com',
 					'key': 'hotspot',
 					'slug': 'hotspot',
 					'description': '',
