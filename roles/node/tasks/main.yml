@@ -50,6 +50,6 @@
   with_items: apps
 
 - name: Start the app containers
-  shell: docker run -p {{item.port}}:80 -d - {{item.key}}
+  shell: docker run -p {{item.port}}:80 -d {{item.key}}
   when: apps is defined
   with_items: apps
