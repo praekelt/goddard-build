@@ -18,7 +18,7 @@
   template: src=nginx.site.conf dest=/etc/nginx/conf.d/apps.conf
 
 - name: Write out the NGINX config for all the apps
-  service: src=nginx state=restarted
+  service: name=nginx state=restarted
 
 - name: Assures /var/goddard/apps exists
   file: path=/var/goddard/apps state=directory
