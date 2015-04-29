@@ -34,7 +34,7 @@
 - name: Build Docker image of each App
   shell: docker build --tag="{{item.key}}" --rm=true
   args:
-    chdir="/var/goddard/apps/{{item.key}}"
+    chdir: "/var/goddard/apps/{{item.key}}"
   when: apps is defined
   with_items: apps
 
@@ -44,7 +44,7 @@
     image: "{{item.key}}"
     state: reloaded
     ports:
-    - "{{item.port}}:{{item.port}}"
+    - "80:{{item.port}}"
     env:
       NODE_ENV: production
       PORT: "{{item.port}}"
