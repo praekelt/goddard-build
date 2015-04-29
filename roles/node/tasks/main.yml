@@ -26,10 +26,10 @@
   with_items: apps
 
 - name: Import our base image
-  shell: cat /var/goddard/base.image.tar | docker import - iodigital/ubuntu
+  shell: cat /var/goddard/base.img.tar | docker import - iodigital/ubuntu
 
 - name: Import our base image
-  shell: cat /var/goddard/node.image.tar | docker import - iodigital/ubuntu-node
+  shell: cat /var/goddard/node.img.tar | docker import - iodigital/ubuntu-node
 
 - name: Build Docker image of each App
   shell: docker build --tag="{{item.key}}" --rm=true
