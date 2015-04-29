@@ -48,6 +48,7 @@
   shell: docker rm  $(docker ps -a | awk '/{{item.key}}/{print $1}')
   when: apps is defined
   with_items: apps
+  ignore_errors: yes
 
 - name: Start the app containers
   shell: docker run -p {{item.port}}:80 -d {{item.key}}
