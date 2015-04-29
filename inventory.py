@@ -108,8 +108,9 @@ def start():
 					'domain': 'goddard.com',
 					'key': 'hotspot',
 					'slug': 'hotspot',
-					'description': '',
+					'description': 'The hotspot',
 					'logo': '',
+					'description': '',
 					'port': 6000,
 					'internal': True
 
@@ -165,6 +166,7 @@ def start():
 							'port': 6100 + int(node_id_str),
 							'name': app_name_str,
 							'slug': app_slug_str,
+							'description': app_obj.description,
 							'logo': '',
 							'key': app_image_str,
 							'domain': str(app_image_str),
