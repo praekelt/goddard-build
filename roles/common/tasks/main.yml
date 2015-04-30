@@ -34,8 +34,5 @@
     - python-setuptools
     - nginx
 
-- name: Copy over nginx config
-  template: src=nginx.site.conf dest=/etc/nginx/conf.d/default.conf
-
 - name: Restart nginx to apply new config
   service: name=nginx state=restarted
