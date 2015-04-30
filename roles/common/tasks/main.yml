@@ -3,6 +3,9 @@
 - name: Set correct hostname
   hostname: name={{inventory_hostname}}
 
+- name: Add permanent hostname to /etc/hostname
+  shell: echo "{{ inventory_hostname }}" > /etc/hostname
+
 - name: set /etc/localtime
   file: src=/usr/share/zoneinfo/Africa/Johannesburg dest=/etc/localtime
 
@@ -15,21 +18,9 @@
 - name: setup hostname
   template: src=hostname dest=/etc/hostname
 
-- name: Add permanent hostname to /etc/hostname
-  shell: echo "{{ inventory_hostname }}" > /etc/hostname
-
-- name: Add nginx key
-  apt_key: url='http://nginx.org/keys/nginx_signing.key' state=present
-
-- name: Update ppa for nginx
-  apt_repository: repo='deb http://nginx.org/packages/ubuntu/ precise nginx' state=present
-
 - name: Update cache
   apt: update_cache=yes
   ignore_errors: yes
-
-#- name: upgrade a server
-#  apt: upgrade=safe
 
 - name: Install common and deps
   apt: pkg={{ item }} state=present
