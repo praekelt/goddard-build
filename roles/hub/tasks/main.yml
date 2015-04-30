@@ -5,18 +5,36 @@
   with_items:
     - redis-server
     - postgresql-9.3
+    - easy_install
+
+
+- name: Install python dependencies
+  shell: easy_install {{item}}
+  with_items:
+    - ansible
+    - configparser
+    - psycopg2
+
+- name: Setup the users required for the server
+  user: name=node createhome=yes home=/home/node
+
+- name: Setup the required users for the server
+  user: name=io createhome=yes home=/home/node
 
 - name: Create database in postgres for site
-  postgresql_db: name=goddard state=present
+  postgresql_db: name={{db_name}} state=present
 
 - name: Create user for the site in the database
-  postgresql_user: db=goddard name=goddard_user password=ceec4eif7ya priv=CONNECT/products:ALL
+  postgresql_user: db={{db_name}} name={{db_user}} password={{db_password}} priv=CONNECT/products:ALL
 
 - name: Ensure app deployment exists
-  file: path=/var/sites state=directory
+  file: path=/var/apps state=directory
 
 - name: Pull Site Code
-  git: repo=git@github.com:praekelt/goddard-hub-server.git dest=/var/sites/hub.goddard
+  git: repo=git@github.com:praekelt/goddard-hub-server.git dest=/var/apps/hub
+
+- name: Pull Site Code
+  git: repo=git@github.com:praekelt/goddard-build.git dest=/var/apps/build
 
 - name: Write out the upstart service to run the goddard hub server
   template: src=hub.upstart.conf dest=/etc/init/goddard-hub.conf
