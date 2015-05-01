@@ -6,15 +6,6 @@
 - name: Add permanent hostname to /etc/hostname
   shell: echo "{{ inventory_hostname }}" > /etc/hostname
 
-- name: set /etc/localtime
-  file: src=/usr/share/zoneinfo/Africa/Johannesburg dest=/etc/localtime
-
-- name: set /etc/timezone
-  template: src=timezone dest=/etc/timezone
-
-- name: update tzdata
-  command: /usr/sbin/dpkg-reconfigure --frontend noninteractive tzdata
-
 - name: setup hostname
   template: src=hostname dest=/etc/hostname
 
@@ -28,11 +19,6 @@
     - curl
     - aptitude
     - git
-    - htop
-    - iftop
     - build-essential
     - python-setuptools
     - nginx
-
-- name: Restart nginx to apply new config
-  service: name=nginx state=restarted
