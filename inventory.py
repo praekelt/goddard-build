@@ -192,14 +192,17 @@ def start():
 
 					}
 
+					# create the group name
+					public_group_key_str = str(group_key_str) + ":children"
+
 					# add if not in already
-					if group_key_str not in grouping_output:
+					if public_group_key_str not in grouping_output:
 
 						# add it
-						grouping_output[ group_key_str ] = []
+						grouping_output[ public_group_key_str ] = []
 
 					# then create it
-					grouping_output[ group_key_str ].append( node_serial_str )
+					grouping_output[ public_group_key_str ].append( node_serial_str )
 
 		# add the meta
 		grouping_output['_meta']['hostvars'][ node_serial_str ] = machine_obj['meta']
