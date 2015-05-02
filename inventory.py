@@ -137,10 +137,10 @@ def start():
 					if int(install_obj.groupId) == int(node_group_id):
 
 						# add if not in already
-						if app_slug_str not in grouping_output:
+						if app_key_str not in grouping_output:
 
 							# add it
-							grouping_output[ app_slug_str ] = []
+							grouping_output[ app_key_str ] = []
 
 						# then create it
 						grouping_output[ app_key_str ].append( node_serial_str )
