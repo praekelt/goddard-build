@@ -101,21 +101,6 @@ def start():
 			'ansible_ssh_host': 'localhost',
 			'ansible_ssh_port': int(node_port_str),
 			'apps': [
-
-				{
-
-					'name': 'Hotspot',
-					'domain': 'goddard.com',
-					'key': 'goddard.com',
-					'slug': 'hotspot',
-					'description': 'The hotspot',
-					'logo': '',
-					'description': '',
-					'port': 6000,
-					'internal': True
-
-				}
-
 			]
 
 		}
@@ -141,8 +126,9 @@ def start():
 				# group details
 				app_id_str = app_obj.id
 				app_name_str = app_obj.name
-				app_image_str = app_obj.image
-				app_slug_str = app_obj.slug
+				app_key_str = app_obj.key
+				app_visible_str = app_obj.visible
+				app_portal_str = app_obj.portal
 
 				# loop all the installs for this nodes' groups
 				for install_obj in install_objs:
@@ -157,20 +143,26 @@ def start():
 							grouping_output[ app_slug_str ] = []
 
 						# then create it
-						grouping_output[ app_slug_str ].append( node_serial_str )
+						grouping_output[ app_key_str ].append( node_serial_str )
 
-						# add app if not in there already
+						# generate the domain
+						domain_str = app_key_str + '.goddard.com'
+
+						# check if this is a portal or not
+						if str(app_portal_str) == '1':
+							domain_str = 'goddard.com'
+
+						# append to the apps
 						machine_obj['meta']['apps'].append({
 
 							'id': app_id_str,
 							'port': 6100 + int(node_id_str),
 							'name': app_name_str,
-							'slug': app_slug_str,
 							'description': app_obj.description,
 							'logo': '',
-							'key': app_image_str,
-							'domain': str(app_image_str),
-							'internal': False
+							'key': app_key_str,
+							'domain': domain_str,
+							'internal': str(app_visible_str) == '0'
 
 						})
 
@@ -180,6 +172,7 @@ def start():
 				# group details
 				group_id_str = group_obj.id
 				group_name_str = group_obj.name
+				group_key_str = group_obj.key
 				group_description_str = group_obj.description
 				group_slug_str = group_obj.name
 
@@ -197,7 +190,7 @@ def start():
 					}
 
 					# set the name
-					group_full_name_str = group_name_str
+					group_full_name_str = group_key_str
 
 					# add if not in already
 					if group_name_str not in grouping_output:
