@@ -142,8 +142,11 @@ def start():
 							# add it
 							grouping_output[ app_key_str ] = []
 
-						# then create it
-						grouping_output[ app_key_str ].append( node_serial_str )
+						# add the serial if not in group
+						if node_serial_str not in grouping_output[ app_key_str ]:							
+
+							# then create it
+							grouping_output[ app_key_str ].append( node_serial_str )
 
 						# generate the domain
 						domain_str = app_key_str + '.goddard.com'
@@ -189,17 +192,14 @@ def start():
 
 					}
 
-					# set the name
-					group_full_name_str = group_key_str
-
 					# add if not in already
-					if group_name_str not in grouping_output:
+					if group_key_str not in grouping_output:
 
 						# add it
-						grouping_output[ group_name_str ] = []
+						grouping_output[ group_key_str ] = []
 
 					# then create it
-					grouping_output[ group_name_str ].append( node_serial_str )
+					grouping_output[ group_key_str ].append( node_serial_str )
 
 		# add the meta
 		grouping_output['_meta']['hostvars'][ node_serial_str ] = machine_obj['meta']
