@@ -1,6 +1,6 @@
 ---
 - name: Check that the docker daemon is started
-  service: name=docker.io state=started
+  service: name=docker state=started
 
 - name: Populate apps.json with all running apps
   template: src=apps.json dest=/var/goddard/apps.json
