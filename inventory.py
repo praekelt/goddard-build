@@ -168,7 +168,7 @@ def start():
 							machine_obj['meta']['apps'].append({
 
 								'id': app_id_str,
-								'port': 6100 + int(node_id_str),
+								'port': 6100 + int(app_id_str),
 								'name': app_name_str,
 								'description': app_obj.description,
 								'logo': '',
