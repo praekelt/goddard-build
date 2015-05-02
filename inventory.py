@@ -105,6 +105,9 @@ def start():
 
 		}
 
+		# keep track of app keys
+		app_key_strs = []
+
 		# add in the extra details
 		machine_obj['meta']['node'] = {
 
@@ -155,19 +158,25 @@ def start():
 						if app_portal_str == True:
 							domain_str = 'goddard.com'
 
-						# append to the apps
-						machine_obj['meta']['apps'].append({
+						# add the key
+						if app_key_str not in app_key_strs: 
 
-							'id': app_id_str,
-							'port': 6100 + int(node_id_str),
-							'name': app_name_str,
-							'description': app_obj.description,
-							'logo': '',
-							'key': app_key_str,
-							'domain': domain_str,
-							'internal': app_visible_str == False
+							#add it
+							app_key_strs.append(app_key_str)
 
-						})
+							# append to the apps
+							machine_obj['meta']['apps'].append({
+
+								'id': app_id_str,
+								'port': 6100 + int(node_id_str),
+								'name': app_name_str,
+								'description': app_obj.description,
+								'logo': '',
+								'key': app_key_str,
+								'domain': domain_str,
+								'internal': app_visible_str == False
+
+							})
 
 			# loop them all
 			for group_obj in group_objs:
