@@ -152,7 +152,7 @@ def start():
 						domain_str = app_key_str + '.goddard.com'
 
 						# check if this is a portal or not
-						if str(app_portal_str) == '1':
+						if app_portal_str == True:
 							domain_str = 'goddard.com'
 
 						# append to the apps
@@ -165,7 +165,7 @@ def start():
 							'logo': '',
 							'key': app_key_str,
 							'domain': domain_str,
-							'internal': str(app_visible_str) == '0'
+							'internal': app_visible_str == False
 
 						})
 
