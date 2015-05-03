@@ -1,4 +1,7 @@
 ---
+- name: Update build.json
+  shell: echo "{\"build\":\"busy\",\"process\":\"Checking NUC Status\",\"timestamp\":\"0\"}" > /var/goddard/build.json
+
 - name: Check that the docker daemon is started
   service: name=docker state=started
 
