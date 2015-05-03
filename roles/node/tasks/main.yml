@@ -1,6 +1,6 @@
 ---
 - name: Update build.json
-  shell: echo "{\"build\":\"busy\",\"process\":\"Checking NUC Status\",\"timestamp\":\"0\"}" > /var/goddard/build.json
+  shell: echo "{\"build\":\"busy\",\"process\":\"Checking Node Status ...\",\"timestamp\":\"0\"}" > /var/goddard/build.json
 
 - name: Check that the docker daemon is started
   service: name=docker state=started
@@ -11,6 +11,9 @@
 - name: Write out the NGINX config for all the apps
   template: src=nginx.site.conf dest=/etc/nginx/conf.d/apps.conf
 
+- name: Update build.json
+  shell: echo "{\"build\":\"busy\",\"process\":\"Downloading Apps ...\",\"timestamp\":\"0\"}" > /var/goddard/build.json
+
 - name: Clone down code for each app
   synchronize: src=/var/goddard/apps/{{item.key}}/ dest=/var/goddard/apps/{{item.key}} recursive=yes times=no owner=no perms=no archive=no
   when: apps is defined
@@ -19,12 +22,18 @@
 - name: Import our base image
   shell: docker load < /var/goddard/node.img.tar
 
+- name: Update build.json
+  shell: echo "{\"build\":\"busy\",\"process\":\"Preparing Apps ...\",\"timestamp\":\"0\"}" > /var/goddard/build.json
+
 - name: Build Docker image of each App
   shell: docker build --tag="{{item.key}}" --rm=true .
   args:
     chdir: "/var/goddard/apps/{{item.key}}"
   when: apps is defined
   with_items: apps
+
+- name: Update build.json
+  shell: echo "{\"build\":\"busy\",\"process\":\"Starting Apps ...\",\"timestamp\":\"0\"}" > /var/goddard/build.json
 
 - name: Delete all running containers
   shell: docker kill $(docker ps -a -q)
@@ -37,3 +46,6 @@
 
 - name: Restart NGINX to load new site configs
   service: name=nginx state=restarted
+
+- name: Update build.json
+  shell: echo "{\"build\":\"done\",\"process\":\"Completed\",\"timestamp\":\"0\"}" > /var/goddard/build.json
