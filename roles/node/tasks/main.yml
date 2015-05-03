@@ -40,7 +40,7 @@
   ignore_errors: yes
 
 - name: Start the app containers
-  shell: docker run -p {{item.port}}:8080 -d {{item.key}}
+  shell: docker run --restart=always -p {{item.port}}:8080 -d {{item.key}}
   when: apps is defined
   with_items: apps
 
