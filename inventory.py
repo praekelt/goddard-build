@@ -96,8 +96,6 @@ def start():
 
 			'ansible_ssh_user': 'goddard',
 			'ansible_sudo': True,
-			'ansible_sudo_pass': 'rogerwilco',
-			'ansible_ssh_pass': 'rogerwilco',
 			'ansible_ssh_host': 'localhost',
 			'ansible_ssh_port': int(node_port_str),
 			'apps': [
