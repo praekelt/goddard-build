@@ -1,0 +1,4 @@
+#!/bin/bash
+
+cp -a $REPO ./build/$NAME
+rm -rf ./build/$NAME/.git
