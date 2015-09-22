@@ -3,4 +3,4 @@
   shell: rsync -aPzr node@hub.goddard.unicore.io:/var/goddard/agent/ /var/goddard/agent
 
 - name: Run a provision script for the node which will take care of setting up new services 
-  shell: cd /var/goddard/agent && chmod a+x scripts/init.sh && scripts/setup.sh
+  shell: cd /var/goddard/agent && chmod a+x scripts/init.sh && chmod a+x scripts/setup.sh && scripts/setup.sh
