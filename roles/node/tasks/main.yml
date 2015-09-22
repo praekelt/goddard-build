@@ -18,7 +18,7 @@
   shell: chmod a+x /var/goddard/agent/scripts/boot.sh
 
 - name: Run provision on the node for initial config
-  shel: cd /var/goddard/agent && ./scripts/provision.sh
+  shell: cd /var/goddard/agent && ./scripts/provision.sh
 
 - name: Start the setup service that will ensure all the apps are good
   service: name=goddardboot state=started
