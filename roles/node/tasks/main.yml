@@ -5,8 +5,17 @@
 - name: Write the new upstart script
   shell: cat /var/goddard/agent/scripts/boot.upstart.conf > /etc/init/goddardboot.conf
 
-- name: Run a provision script
-  shell: cd /var/goddard/agent && chmod a+x scripts/init.sh && chmod a+x scripts/setup.sh && scripts/provision.sh
+- name: Make init executable
+  shell: cd /var/goddard/agent && chmod a+x scripts/init.sh
+
+- name: Make setup executable
+  shell: cd /var/goddard/agent && chmod a+x scripts/setup.sh
+
+- name: Make provision executable
+  shell: cd /var/goddard/agent && chmod a+x scripts/provision.sh
+
+- name: Make boot executable
+  shell: cd /var/goddard/agent && chmod a+x scripts/boot.sh
 
 - name: Start the setup service that will ensure all the apps are good
   service: name=goddardboot state=started
