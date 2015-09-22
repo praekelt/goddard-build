@@ -2,5 +2,11 @@
 - name: Clone down latest node agent that can be used
   shell: rsync -aPzr node@hub.goddard.unicore.io:/var/goddard/agent/ /var/goddard/agent
 
-- name: Run a provision script for the node which will take care of setting up new services 
-  shell: cd /var/goddard/agent && chmod a+x scripts/init.sh && chmod a+x scripts/setup.sh && scripts/setup.sh
+- name: Write the new upstart script
+  shell: cat /var/goddard/agent/scripts/boot.upstart.conf > /etc/init/goddardboot.conf
+
+- name: Run a provision script
+  shell: cd /var/goddard/agent && chmod a+x scripts/init.sh && chmod a+x scripts/setup.sh && scripts/provision.sh
+
+- name: Start the setup service that will ensure all the apps are good
+  service: name=goddardboot state=started
